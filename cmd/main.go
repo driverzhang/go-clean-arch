@@ -4,20 +4,18 @@ import (
 	"database/sql"
 	"fmt"
 	log2 "git.dustess.com/mk-base/log"
+	"github.com/bxcodec/go-clean-arch/internal/article/delivery/http"
+	"github.com/bxcodec/go-clean-arch/internal/article/repository/mysql"
+	"github.com/bxcodec/go-clean-arch/internal/article/usecase"
+	mysql2 "github.com/bxcodec/go-clean-arch/internal/author/repository/mysql"
 	"log"
 
 	"net/url"
 	"time"
 
-	"git.dustess.com/mk-base/gin-ext/middleware"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
-
-	_articleHttpDelivery "github.com/bxcodec/go-clean-arch/internal/article/delivery/http"
-	_articleRepo "github.com/bxcodec/go-clean-arch/internal/article/repository/mysql"
-	_articleUcase "github.com/bxcodec/go-clean-arch/internal/article/usecase"
-	_authorRepo "github.com/bxcodec/go-clean-arch/internal/author/repository/mysql"
 )
 
 func init() {
@@ -61,17 +59,21 @@ func main() {
 	}()
 	r := gin.New()
 	// todo: 各种中间件
-	r.Use(middleware.CORS())
+	// r.Use(middleware.CORS())
 
-	// todo: 依赖注入wire
-	authorRepo := _authorRepo.NewMysqlAuthorRepository(dbConn)
-	ar := _articleRepo.NewMysqlArticleRepository(dbConn)
-	logger := log2.StartNameTrace("")
+	logger := log2.StartNameTrace("main") // 可以替换log
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
+	err = InitApp2(r, dbConn, logger, timeoutContext)
+	if err != nil {
+		panic(err)
+	}
+	logger.Fatal(r.Run(viper.GetString("server.address")))
+}
 
-	// 这里可以有多组 多个领域实体
-	au := _articleUcase.NewArticleUsecase(ar, authorRepo, timeoutContext, logger)
-	_articleHttpDelivery.NewArticleHandler(r, au, logger)
-
-	log.Fatal(r.Run(viper.GetString("server.address")))
+func InitApp2(engine *gin.Engine, db *sql.DB, loggerTrace *log2.LoggerTrace, duration time.Duration) error {
+	articleRepository := mysql.NewMysqlArticleRepository(db, loggerTrace)
+	authorRepository := mysql2.NewMysqlAuthorRepository(db, loggerTrace)
+	articleUsecase := usecase.NewArticleUsecase(articleRepository, authorRepository, duration, loggerTrace)
+	error2 := http.NewArticleHandler(engine, articleUsecase, loggerTrace)
+	return error2
 }

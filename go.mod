@@ -9,6 +9,7 @@ require (
 	github.com/bxcodec/faker v1.4.2
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/google/wire v0.5.0
 	github.com/labstack/echo v3.3.5+incompatible
 	github.com/labstack/gommon v0.0.0-20180426014445-588f4e8bddc6 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

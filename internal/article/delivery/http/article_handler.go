@@ -3,12 +3,16 @@ package http
 import (
 	log2 "git.dustess.com/mk-base/log"
 	"github.com/gin-gonic/gin"
+	"github.com/google/wire"
 	"github.com/sirupsen/logrus"
 	validator "gopkg.in/go-playground/validator.v9"
 	"net/http"
 
 	"github.com/bxcodec/go-clean-arch/domain"
 )
+
+// ProviderSet is server providers.
+var ProviderSet = wire.NewSet(NewArticleHandler)
 
 // ResponseError represent the reseponse error struct
 type ResponseError struct {
@@ -22,7 +26,7 @@ type ArticleHandler struct {
 }
 
 // NewArticleHandler will initialize the articles/ resources endpoint
-func NewArticleHandler(e *gin.Engine, us domain.ArticleUsecase, log *log2.LoggerTrace) {
+func NewArticleHandler(e *gin.Engine, us domain.ArticleUsecase, log *log2.LoggerTrace) error {
 	handler := &ArticleHandler{
 		AUsecase: us,
 		log:      log,
@@ -31,6 +35,7 @@ func NewArticleHandler(e *gin.Engine, us domain.ArticleUsecase, log *log2.Logger
 	e.POST("/articles", handler.Store)
 	e.GET("/articles/:id", handler.GetByID)
 	e.DELETE("/articles/:id", handler.Delete)
+	return nil
 }
 
 // FetchArticle will fetch the article based on given params

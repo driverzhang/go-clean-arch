@@ -4,7 +4,12 @@ import (
 	ginConfig "git.dustess.com/mk-base/gin-ext/config"
 	ginConstant "git.dustess.com/mk-base/gin-ext/constant"
 	"git.dustess.com/mk-base/gonfig"
+"github.com/google/wire"
 )
+
+// ProviderSet is server providers.
+var ProviderSet = wire.NewSet(NewConfig)
+
 
 // Config 配置结构
 type Config struct {

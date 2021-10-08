@@ -4,20 +4,26 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
+	"git.dustess.com/mk-base/log"
+	"github.com/google/wire"
+	
 	"github.com/sirupsen/logrus"
 
 	"github.com/bxcodec/go-clean-arch/domain"
 	"github.com/bxcodec/go-clean-arch/internal/article/repository"
 )
 
+// ProviderSet is server providers.
+var ProviderSet = wire.NewSet(NewMysqlArticleRepository)
+
 type mysqlArticleRepository struct {
 	Conn *sql.DB
+	log *log.LoggerTrace
 }
 
 // NewMysqlArticleRepository will create an object that represent the article.Repository interface
-func NewMysqlArticleRepository(Conn *sql.DB) domain.ArticleRepository {
-	return &mysqlArticleRepository{Conn}
+func NewMysqlArticleRepository(Conn *sql.DB, 	log *log.LoggerTrace) domain.ArticleRepository {
+	return &mysqlArticleRepository{Conn, log}
 }
 
 func (m *mysqlArticleRepository) fetch(ctx context.Context, query string, args ...interface{}) (result []domain.Article, err error) {

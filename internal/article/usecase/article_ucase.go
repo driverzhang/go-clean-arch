@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"git.dustess.com/mk-base/log"
+	"github.com/google/wire"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -10,6 +11,9 @@ import (
 
 	"github.com/bxcodec/go-clean-arch/domain"
 )
+
+// ProviderSet is server providers.
+var ProviderSet = wire.NewSet(NewArticleUsecase)
 
 type articleUsecase struct {
 	articleRepo    domain.ArticleRepository

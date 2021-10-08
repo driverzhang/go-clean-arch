@@ -3,18 +3,25 @@ package mysql
 import (
 	"context"
 	"database/sql"
-
+	"git.dustess.com/mk-base/log"
+	"github.com/google/wire"
+	
 	"github.com/bxcodec/go-clean-arch/domain"
 )
 
+// ProviderSet is server providers.
+var ProviderSet = wire.NewSet(NewMysqlAuthorRepository)
+
 type mysqlAuthorRepo struct {
 	DB *sql.DB
+	log *log.LoggerTrace
 }
 
 // NewMysqlAuthorRepository will create an implementation of author.Repository
-func NewMysqlAuthorRepository(db *sql.DB) domain.AuthorRepository {
+func NewMysqlAuthorRepository(db *sql.DB, log *log.LoggerTrace) domain.AuthorRepository {
 	return &mysqlAuthorRepo{
 		DB: db,
+		log: log,
 	}
 }
 
