@@ -4,10 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	log2 "git.dustess.com/mk-base/log"
-	"github.com/bxcodec/go-clean-arch/internal/article/delivery/http"
-	"github.com/bxcodec/go-clean-arch/internal/article/repository/mysql"
-	"github.com/bxcodec/go-clean-arch/internal/article/usecase"
-	mysql2 "github.com/bxcodec/go-clean-arch/internal/author/repository/mysql"
 	"log"
 
 	"net/url"
@@ -63,17 +59,8 @@ func main() {
 
 	logger := log2.StartNameTrace("main") // 可以替换log
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	err = InitApp2(r, dbConn, logger, timeoutContext)
-	if err != nil {
+	if err = InitApp(r, dbConn, logger, timeoutContext); err != nil {
 		panic(err)
 	}
 	logger.Fatal(r.Run(viper.GetString("server.address")))
-}
-
-func InitApp2(engine *gin.Engine, db *sql.DB, loggerTrace *log2.LoggerTrace, duration time.Duration) error {
-	articleRepository := mysql.NewMysqlArticleRepository(db, loggerTrace)
-	authorRepository := mysql2.NewMysqlAuthorRepository(db, loggerTrace)
-	articleUsecase := usecase.NewArticleUsecase(articleRepository, authorRepository, duration, loggerTrace)
-	error2 := http.NewArticleHandler(engine, articleUsecase, loggerTrace)
-	return error2
 }
