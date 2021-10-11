@@ -11,7 +11,9 @@ import (
 	"github.com/bxcodec/go-clean-arch/internal/article/delivery/http"
 	"github.com/bxcodec/go-clean-arch/internal/article/repository/mysql"
 	"github.com/bxcodec/go-clean-arch/internal/article/usecase"
+	http2 "github.com/bxcodec/go-clean-arch/internal/author/delivery/http"
 	mysql2 "github.com/bxcodec/go-clean-arch/internal/author/repository/mysql"
+	usecase2 "github.com/bxcodec/go-clean-arch/internal/author/usecase"
 	"github.com/gin-gonic/gin"
 	"time"
 )
@@ -28,5 +30,12 @@ func InitApp(engine *gin.Engine, db *sql.DB, loggerTrace *log.LoggerTrace, durat
 	authorRepository := mysql2.NewMysqlAuthorRepository(db, loggerTrace)
 	articleUsecase := usecase.NewArticleUsecase(articleRepository, authorRepository, duration, loggerTrace)
 	error2 := http.NewArticleHandler(engine, articleUsecase, loggerTrace)
+	return error2
+}
+
+func InitApp2(engine *gin.Engine, db *sql.DB, loggerTrace *log.LoggerTrace, duration time.Duration) error {
+	authorRepository := mysql2.NewMysqlAuthorRepository(db, loggerTrace)
+	authorUsecase := usecase2.NewAuthorUsecase(authorRepository, duration, loggerTrace)
+	error2 := http2.NewAuthorHandler(engine, authorUsecase, loggerTrace)
 	return error2
 }

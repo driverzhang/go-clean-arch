@@ -62,5 +62,10 @@ func main() {
 	if err = InitApp(r, dbConn, logger, timeoutContext); err != nil {
 		panic(err)
 	}
+
+	if err = InitApp2(r, dbConn, logger, timeoutContext); err != nil {
+		panic(err)
+	}
+
 	logger.Fatal(r.Run(viper.GetString("server.address")))
 }
